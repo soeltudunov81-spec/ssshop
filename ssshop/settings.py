@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url  # Добавили этот импорт
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,7 +9,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-ss-shop-secret-key-ch
 
 DEBUG = config('DEBUG', default='True', cast=bool)
 
-ALLOWED_HOSTS = ['*']
+# Для Railway лучше использовать настройки из руководства
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.railway.app').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,15 +55,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ssshop.wsgi.application'
 
+# ИСПРАВЛЕННЫЙ БЛОК DATABASES
+# Теперь он берет готовую строку подключения DATABASE_URL от Railway
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('PGDATABASE', default=''),
-        'USER': config('PGUSER', default=''),
-        'PASSWORD': config('PGPASSWORD', default=''),
-        'HOST': config('PGHOST', default='localhost'),
-        'PORT': config('PGPORT', default='5432'),
-    }
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default=''),
+        conn_max_age=600
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
