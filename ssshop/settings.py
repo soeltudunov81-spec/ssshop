@@ -96,9 +96,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Используем WhiteNoise для сжатия
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# Игнорируем ошибки отсутствующих .map файлов
 WHITENOISE_ALLOW_MISSING_FILES = True
 
 # МЕДИА ФАЙЛЫ (Cloudinary)
@@ -116,8 +114,14 @@ TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Настройки безопасности для Railway
+# --- ИСПРАВЛЕНИЯ ДЛЯ АДМИНКИ И CSRF НА RAILWAY ---
 CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app',
     'https://*.up.railway.app',
 ]
+
+# Настройки для корректной работы сессий через HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# --------------------------------------------------
