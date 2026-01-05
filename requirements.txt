@@ -3,6 +3,6 @@ gunicorn
 python-decouple
 dj-database-url
 psycopg2-binary
+whitenoise
 cloudinary
 django-cloudinary-storage
-whitenoise
