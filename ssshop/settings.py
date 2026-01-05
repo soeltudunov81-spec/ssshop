@@ -7,13 +7,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-ss-shop-secret-key-change-in-production')
 
+# На проде лучше ставить False, но для отладки пока оставим так
 DEBUG = config('DEBUG', default='True', cast=bool)
 
-# Обновлено для Render
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.onrender.com,localhost,127.0.0.1').split(',')
+# Исправлено под Railway
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.railway.app,localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
-    'jazzmin',  # Красивая админка
+    'jazzmin',  # Красивая админка (должна быть выше admin)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -25,7 +26,6 @@ INSTALLED_APPS = [
     'shop',
 ]
 
-# Настройки Jazzmin (тема, которую ты использовал)
 JAZZMIN_SETTINGS = {
     "site_title": "SS Shop Admin",
     "site_header": "SS SHOP",
@@ -43,7 +43,7 @@ JAZZMIN_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Для статики
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Обработка статики
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,7 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ssshop.wsgi.application'
 
-# Универсальный блок базы данных
+# Настройка базы данных через DATABASE_URL
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
@@ -92,14 +92,16 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-# СТАТИКА
+# СТАТИЧЕСКИЕ ФАЙЛЫ
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Используем WhiteNoise для сжатия
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_ALLOW_MISSING_FILES = True # Чтобы не падать из-за .map файлов
+# Игнорируем ошибки отсутствующих .map файлов
+WHITENOISE_ALLOW_MISSING_FILES = True
 
-# МЕДИА (Cloudinary)
+# МЕДИА ФАЙЛЫ (Cloudinary)
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -114,8 +116,8 @@ TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Довереные домены для Render
+# Настройки безопасности для Railway
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',
     'https://*.railway.app',
+    'https://*.up.railway.app',
 ]
