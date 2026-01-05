@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
-import dj_database_url  # Добавили этот импорт
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,10 +9,11 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-ss-shop-secret-key-ch
 
 DEBUG = config('DEBUG', default='True', cast=bool)
 
-# Для Railway лучше использовать настройки из руководства
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.railway.app').split(',')
+# Обновлено для Render
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.onrender.com,localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
+    'jazzmin',  # Красивая админка
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -24,9 +25,25 @@ INSTALLED_APPS = [
     'shop',
 ]
 
+# Настройки Jazzmin (тема, которую ты использовал)
+JAZZMIN_SETTINGS = {
+    "site_title": "SS Shop Admin",
+    "site_header": "SS SHOP",
+    "welcome_sign": "Добро пожаловать в SS Shop!",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "shop.category": "fas fa-tag",
+        "shop.product": "fas fa-box",
+        "shop.order": "fas fa-shopping-cart",
+    },
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Для статики
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,11 +72,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ssshop.wsgi.application'
 
-# ИСПРАВЛЕННЫЙ БЛОК DATABASES
-# Теперь он берет готовую строку подключения DATABASE_URL от Railway
+# Универсальный блок базы данных
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL', default=''),
+        default=config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
         conn_max_age=600
     )
 }
@@ -76,11 +92,14 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
+# СТАТИКА
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_ALLOW_MISSING_FILES = True # Чтобы не падать из-за .map файлов
 
+# МЕДИА (Cloudinary)
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -95,8 +114,8 @@ TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Довереные домены для Render
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.replit.dev',
-    'https://*.repl.co',
+    'https://*.onrender.com',
     'https://*.railway.app',
 ]
