@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог - SS Shop{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 fade-in">
+        <h1 class="text-4xl md:text-5xl font-bold text-black mb-4">Наш каталог</h1>
+        <p class="text-gray-600 text-lg">Премиальные товары для вас</p>
+    </div>
+
+    {% if products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for product in products %}
+        <a href="{% url 'shop:product_detail' product.pk %}" class="product-card glass rounded-2xl overflow-hidden fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
+            <div class="aspect-square overflow-hidden">
+                {% if product.get_main_image %}
+                <img src="{{ product.get_main_image }}" alt="{{ product.name }}" 
+                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                {% endif %}
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-lg text-black mb-1 truncate">{{ product.name }}</h3>
+                <div class="flex justify-between items-center">
+                    <p class="text-2xl font-bold text-black">{{ product.price }} ₽</p>
+                    <div class="flex flex-wrap gap-1">
+                        {% for size in product.get_sizes_list|slice:":3" %}
+                        <span class="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">{{ size }}</span>
+                        {% endfor %}
+                        {% if product.get_sizes_list|length > 3 %}
+                        <span class="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">+{{ product.get_sizes_list|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 fade-in">
+        <svg class="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <h2 class="text-2xl font-semibold text-gray-600 mb-2">Товаров пока нет</h2>
+        <p class="text-gray-400">Скоро здесь появятся новые товары</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
